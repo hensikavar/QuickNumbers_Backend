@@ -3,10 +3,11 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
 const app = express();
 
-app.listen(4000, (err) => {
+app.listen(process.env.PORT, '0.0.0.0', (err) => {
   if (err) {
     console.log(err);
   } else {
@@ -15,7 +16,7 @@ app.listen(4000, (err) => {
 });
 
 mongoose
-  .connect("mongodb+srv://mathsflutterproject:HensiRutul@cluster0.ezzs5.mongodb.net/QuickNumbers?retryWrites=true&w=majority&appName=Cluster0", {
+  .connect(process.env.URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -26,14 +27,22 @@ mongoose
     console.log(err.message);
   });
 
+// app.use(
+//   cors({
+//     origin: ["http://localhost:60280"],
+//     methods: ["GET", "POST"],
+//     credentials: true,
+//   })
+// );
+app.use(cookieParser());
 app.use(
   cors({
-    origin: ["http://localhost:3000"],
-    methods: ["GET", "POST"],
-    credentials: true,
+    origin: "*", // Allows requests from any origin
+    methods: ["GET", "POST", "PUT", "DELETE"], // Specify the allowed methods
+    credentials: true, // Enable credentials (cookies, etc.)
   })
 );
-app.use(cookieParser());
+
 
 app.use(express.json());
 app.use("/", authRoutes);
