@@ -3,6 +3,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/authRoutes");
 const topicRoutes = require("./routes/topicRoutes");
+const questionRoutes =  require("./routes/questionRoutes")
+const practiceRoutes = require("./routes/practiceRoutes");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
@@ -46,5 +48,10 @@ app.use(
 
 
 app.use(express.json());
-app.use("/", authRoutes);
+
+app.use("/practice", practiceRoutes);
+app.use("/questions", questionRoutes)
 app.use("/topics", topicRoutes);
+
+app.use("/", authRoutes);
+
