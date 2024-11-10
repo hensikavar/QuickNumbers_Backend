@@ -22,7 +22,7 @@ const handleErrors = (err) => {
     errors.password = "That password is incorrect";
   }
 
-  if (err.code === 11000 && err.keyPattern && err.keyPattern.mobile) {
+  if (err.code === 11000) {
     errors.mobile = "Mobile Number is already registered";
     return errors;
   }
