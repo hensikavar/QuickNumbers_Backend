@@ -5,12 +5,11 @@ const userSchema = new mongoose.Schema({
   username:{
     type: String,
     required: [true, "Username is Required"],
-    unique: true,
+
   },
   email: {
     type: String,
     required: [true, "Email is Required"],
-    unique: true,
   },
   password: {
     type: String,
@@ -18,7 +17,8 @@ const userSchema = new mongoose.Schema({
   },
   mobile: {
     type: String,
-    required: [true, "Password is Required"],
+    required: [true, "Mobile Number is Required"],
+    unique: true,
   },
 });
 
@@ -30,14 +30,17 @@ userSchema.pre("save", async function (next) {
 
 userSchema.statics.login = async function (mobile, password) {
   const user = await this.findOne({ mobile });
-  if (user) {
-    const auth = await bcrypt.compare(password, user.password);
-    if (auth) {
-      return user;
-    }
-    throw Error("incorrect password");
+  if (!user) {
+    throw new Error("incorrect mobile number"); // Throw error if mobile number is incorrect
   }
-  throw Error("incorrect email");
+  
+  // Check if the provided password is correct
+  const auth = await bcrypt.compare(password, user.password);
+  if (!auth) {
+    throw new Error("incorrect password"); // Throw error if password is incorrect
+  }
+
+  return user;
 };
 
 module.exports = mongoose.model("Users", userSchema);

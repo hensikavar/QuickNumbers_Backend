@@ -10,27 +10,20 @@ const createToken = (id) => {
 };
 
 const handleErrors = (err) => {
-  let errors = { username: "" ,email: "", password: "", mobile: "" };
+  let errors = {  mobile: "" , password: ""};
 
   console.log(err);
-  if (err.message === "incorrect email") {
-    errors.email = "That email is not registered";
+
+  if (err.message === "incorrect mobile number") {
+    errors.mobile = "That mobile number is incorrect";
   }
 
   if (err.message === "incorrect password") {
     errors.password = "That password is incorrect";
   }
 
-  if (err.message === "incorrect username") {
-    errors.email = "That username is not registered";
-  }
-
-  if (err.message === "incorrect mobile number") {
-    errors.password = "That mobile number is incorrect";
-  }
-
-  if (err.code === 11000) {
-    errors.email = "Email is already registered";
+  if (err.code === 11000 && err.keyPattern && err.keyPattern.mobile) {
+    errors.mobile = "Mobile Number is already registered";
     return errors;
   }
 
@@ -59,7 +52,8 @@ module.exports.register = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     const errors = handleErrors(err);
-    res.json({ errors, created: false });
+    res.json(errors);
+    // res.json({ errors, created: false });
   }
 };
 
@@ -72,7 +66,9 @@ module.exports.login = async (req, res) => {
     res.status(200).json({ user: user._id, status: true });
   } catch (err) {
     const errors = handleErrors(err);
-    res.json({ errors, status: false });
+    // res.json(err.message);
+    res.json(errors);
+    // res.json({ errors, status: false });
   }
 };
 
@@ -103,6 +99,7 @@ module.exports.updateUser = async(req , res)=>{
 
     res.status(200).json({ user, message: "User updated successfully", status: true });
   } catch (err) {
-    res.status(500).json({ error: err.message, status: false });
+    res.status(500).json(err);
+    // res.status(500).json({ error: err.message, status: false });
   }
 }
