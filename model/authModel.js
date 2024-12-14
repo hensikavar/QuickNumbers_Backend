@@ -20,6 +20,12 @@ const userSchema = new mongoose.Schema({
     required: [true, "Mobile Number is Required"],
     unique: true,
   },
+  otp: {
+    type : String
+  },
+  otpExpiry: {
+    type : Date,
+  } 
 });
 
 userSchema.pre("save", async function (next) {
