@@ -23,7 +23,7 @@ const handleErrors = (err) => {
   }
 
   if (err.code === 11000) {
-    errors.mobile = "Mobile Number is already registered";
+    errors.email = "Email Address is already registered";
     return errors;
   }
 
@@ -58,9 +58,9 @@ module.exports.register = async (req, res, next) => {
 };
 
 module.exports.login = async (req, res) => {
-  const { mobile, password } = req.body;
+  const { email, password } = req.body;
   try {
-    const user = await User.login(mobile, password);
+    const user = await User.login(email, password);
     const token = createToken(user._id);
     res.cookie("jwt", token, { httpOnly: false, maxAge: maxAge * 1000 });
     res.status(200).json({ user: user._id, status: true });

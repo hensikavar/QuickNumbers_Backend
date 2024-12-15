@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: [true, "Email is Required"],
-    unique : false
+    unique : true
   },
   password: {
     type: String,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
   mobile: {
     type: String,
     required: [true, "Mobile Number is Required"],
-    unique: true,
+    unique: false,
   },
   otp: {
     type : String
@@ -34,10 +34,10 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.statics.login = async function (mobile, password) {
-  const user = await this.findOne({ mobile });
+userSchema.statics.login = async function (email, password) {
+  const user = await this.findOne({ email });
   if (!user) {
-    throw new Error("incorrect mobile number"); // Throw error if mobile number is incorrect
+    throw new Error("incorrect email address"); // Throw error if mobile number is incorrect
   }
   
   // Check if the provided password is correct
