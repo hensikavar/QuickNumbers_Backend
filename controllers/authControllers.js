@@ -142,18 +142,29 @@ module.exports.forgotPassword =  async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "hensikavar5129@gmail.com",
-        pass: "pkwi sorb ghep hmvh",
+        user: "quicknumbers10@gmail.com",
+        pass: "wrpw haci hqtj fbdk",
       },
     });
 
     const mailOptions = {
-      from: "hensikavar5129@gmail.com",
+      from: "quicknumbers10@gmail.com",
       to: email,
       subject: "Password Reset OTP",
-      text: `Your OTP for password reset is ${otp}. It is valid for 10 minutes.`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+          <h2 style="text-align: center; color: #007BFF;">Quick Numbers - Password Reset</h2>
+          <p>Dear User,</p>
+          <p>We received a request to reset your password. Please use the OTP below to reset it. The OTP is valid for <strong>10 minutes</strong>.</p>
+          <p style="text-align: center; font-size: 24px; font-weight: bold; color: white ;background-color : black; margin: 20px 0;">${otp}</p>
+          <p>Best regards,</p>
+          <p><strong>Quick Numbers Team</strong></p>
+          <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+          <p style="font-size: 12px; color: #777;">This is an automated message. Please do not reply to this email.</p>
+        </div>
+      `,
     };
-
+    
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         console.error("Error sending email:", error);
@@ -162,40 +173,20 @@ module.exports.forgotPassword =  async (req, res) => {
       }
     });
 
-    res.status(200).json({ message: "OTP sent to email" });
+    
+    const userResponse = {
+      id: user._id,
+      username: user.username,
+      email: user.email,
+      mobile: user.mobile,
+    };
+
+    res.status(200).json({
+      user: userResponse,
+      message: "OTP sent to email",
+      
+    });
   } catch (error) {
     res.status(500).json({ message: "Error sending OTP", error: error.message });
   }
 };
-
-module.exports.resetPassword = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
-
-  try {
-    // Find the user by email and OTP
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    // Check if OTP is valid
-    if (user.otp !== otp || user.otpExpiry < Date.now()) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
-    }
-
-    // Update password
-    const salt = await bcrypt.genSalt();
-    user.password = await bcrypt.hash(newPassword, salt);
-
-    // Clear OTP and expiry
-    user.otp = null;
-    user.otpExpiry = null;
-
-    await user.save();
-
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Error updating password", error: error.message });
-  }
-};
-
