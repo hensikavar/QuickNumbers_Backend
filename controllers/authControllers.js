@@ -72,11 +72,25 @@ module.exports.login = async (req, res) => {
   }
 };
 
+module.exports.updateUser = async (req, res) => {
+  const { username, email, mobile, password } = req.body; // Include oldPassword from the request
+  const { id } = req.params;
 
-module.exports.updateUser = async(req , res)=>{
-  const {username , email , password , mobile} = req.body;
-  const { id } = req.params; 
   try {
+    // Find the user by ID
+    const user = await User.findById(id);
+
+    if (!user) {
+      console.log("User tried");
+      return res.status(404).json({ message: "User not found", status: false });
+    }
+
+    // Compare the provided old password with the stored password
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect) {
+      return res.status(400).json({ message: "Old password is incorrect", status: false });
+    }
+
     // Prepare updated fields
     const updatedFields = {
       username,
@@ -84,25 +98,14 @@ module.exports.updateUser = async(req , res)=>{
       mobile,
     };
 
-    // If a new password is provided, hash it before updating
-    if (password) {
-      const salt = await bcrypt.genSalt();
-      updatedFields.password = await bcrypt.hash(password, salt);
-    }
-
     // Update the user in the database
-    const user = await User.findByIdAndUpdate(id, updatedFields, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(id, updatedFields, { new: true });
 
-    if (!user) {
-      return res.status(404).json({ message: "User not found", status: false });
-    }
-
-    res.status(200).json({ user, message: "User updated successfully", status: true });
+    res.status(200).json({ user: updatedUser, message: "User updated successfully", status: true });
   } catch (err) {
-    res.status(500).json(err);
-    // res.status(500).json({ error: err.message, status: false });
+    res.status(500).json({ error: err.message, status: false });
   }
-}
+};
 
 // Get user by ID
 module.exports.getUserById = async (req, res) => {
@@ -184,7 +187,7 @@ module.exports.forgotPassword =  async (req, res) => {
     res.status(200).json({
       user: userResponse,
       message: "OTP sent to email",
-      
+      otp: otp
     });
   } catch (error) {
     res.status(500).json({ message: "Error sending OTP", error: error.message });
