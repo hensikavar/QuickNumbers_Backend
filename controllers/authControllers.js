@@ -107,6 +107,38 @@ module.exports.updateUser = async (req, res) => {
   }
 };
 
+
+module.exports.updateUserPassword = async(req , res)=>{
+  const {username , email , password , mobile} = req.body;
+  const { id } = req.params; 
+  try {
+    // Prepare updated fields
+    const updatedFields = {
+      username,
+      email,
+      mobile,
+    };
+
+    // If a new password is provided, hash it before updating
+    if (password) {
+      const salt = await bcrypt.genSalt();
+      updatedFields.password = await bcrypt.hash(password, salt);
+    }
+
+    // Update the user in the database
+    const user = await User.findByIdAndUpdate(id, updatedFields, { new: true });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found", status: false });
+    }
+
+    res.status(200).json({ user, message: "User updated successfully", status: true });
+  } catch (err) {
+    res.status(500).json(err);
+    // res.status(500).json({ error: err.message, status: false });
+  }
+}
+
 // Get user by ID
 module.exports.getUserById = async (req, res) => {
   const { id } = req.params;
