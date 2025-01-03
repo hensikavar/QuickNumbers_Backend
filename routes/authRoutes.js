@@ -10,8 +10,6 @@ router.put("/edit/:id", updateUser);
 router.put('/edit/password/:id',updateUserPassword)
 router.get("/:id", getUserById);
 router.post("/forgot-password", forgotPassword);
-// router.post("/verify-otp", verifyOTP);
-//router.put("/reset-password", resetPassword);
 
 
 module.exports = router;

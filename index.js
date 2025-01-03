@@ -30,13 +30,6 @@ mongoose
     console.log(err.message);
   });
 
-// app.use(
-//   cors({
-//     origin: ["http://localhost:60280"],
-//     methods: ["GET", "POST"],
-//     credentials: true,
-//   })
-// );
 app.use(cookieParser());
 app.use(
   cors({
